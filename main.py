@@ -1,4 +1,5 @@
 import os
+import requests
 import dotenv
 import tkinter as tk
 from tkinter import simpledialog
@@ -17,8 +18,21 @@ def ask_duration():
     ROOT.withdraw()
     # The input dialog
     USER_INP = simpledialog.askstring(title="Set Duration",
-                                      prompt="Enter Duration in Minutes:")
-    return int(USER_INP) * 60  # Convert minutes to seconds
+                                      prompt="Enter Duration in Seconds:")
+    return int(USER_INP)  # Convert minutes to seconds
+
+def safe_append_to_worksheet(worksheet, data, max_retries=10, delay=5):
+    attempts = 0
+    while attempts < max_retries:
+        try:
+            worksheet.append_row(data)
+            break  # Break the loop if successful
+        except requests.exceptions.ConnectionError as e:
+            print(f"Connection error occurred: {e}. Retrying...")
+            time.sleep(delay)  # Wait for a while before retrying
+            attempts += 1
+    else:
+        print("Failed to append data after several retries.")
 
 # Set duration time
 duration = ask_duration()
@@ -37,7 +51,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(google_credentials_path
 client = gspread.authorize(creds)
 
 # Open the Google Spreadsheet by title
-sheet_url = "https://docs.google.com/spreadsheets/d/1MUAZ2SH8jrIkczJ9rPwxHZ9lyuQ5fR2kSQZ9T3BRIeY/edit?usp=sharing"
+sheet_url = "https://docs.google.com/spreadsheets/d/1uQSwZAYr629_rGdO1F74Y51p3z0DNtBZJC7VbhbNcPs/edit?usp=sharing"
 spreadsheet = client.open_by_url(sheet_url)
 
 # Get the worksheet by name
@@ -50,7 +64,7 @@ if worksheet is None:
 
 # Define the header names
 header_names = ["Data Time", "ยี่กี HUAY 5 นาที", "ยี่กี HUAY VIP 5 นาที", "ยี่กี LTO 5 นาที", "ยี่กี LTO VIP 5 นาที", "ยี่กี ชัดเจน 5 นาที", "ยี่กี ชัดเจน VIP 5 นาที"]
-
+total_data = [header_names]
 # Check if the worksheet is empty (no header row) and add headers if needed
 existing_headers = worksheet.row_values(1)
 if not existing_headers:
@@ -101,9 +115,10 @@ while True:
 
     order = [5, 7, 9, 11, 13, 15]
     data = []
+    data_com = []
     current_datetime = datetime.now()
     # Format the date and time as YYYY-MM-DD HH:MM
-    data_time = current_datetime.strftime("%Y-%m-%d %H:%M")
+    data_time = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
     data.append(data_time)
     for item in order:
         value_1 = div_elements[item].find('span', class_='mb-0 mx-auto').get_text().split(" ")[-1]
@@ -112,9 +127,16 @@ while True:
         data.append(value_1)
         data.append(value_2)
         data.append(value_3)
+        data_com.append(value_1)
+        data_com.append(value_2)
+        data_com.append(value_3)
     print(data)
-    worksheet.append_row(data)
-
+    try:
+        if data_com != total_data[-1]:
+            total_data.append(data_com)
+            safe_append_to_worksheet(worksheet, data)
+    except Exception as e:
+        print(f"An error occurred: {e}")
     # Wait for the specified duration before repeating
     time.sleep(duration)
 

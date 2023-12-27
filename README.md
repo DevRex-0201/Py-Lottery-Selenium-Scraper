@@ -1,72 +1,49 @@
-# Automated Lottery Data Scraper and Google Sheets Integrator
+# Thai Lottery Result Scraper
 
-This README provides detailed instructions and explanations for using the Automated Lottery Data Scraper and Google Sheets Integrator. This Python script is designed to automate the process of scraping lottery results from a specific website and storing the collected data in a Google Sheets document. The script employs several Python libraries and technologies, including Tkinter for user interaction, Selenium for web scraping, gspread for Google Sheets integration, and BeautifulSoup for HTML parsing.
+## Overview
+This Python project is designed to scrape and collect data from the Thai lottery website, specifically targeting various lottery games. It automatically extracts the latest results at specified intervals and stores them in a Google Spreadsheet for easy access and analysis.
 
 ## Features
-
-1. **User-Defined Duration**: Utilizes Tkinter to prompt the user for a scraping frequency (in minutes).
-2. **Google Sheets Integration**: Automatically updates a specified Google Sheets document with scraped data.
-3. **Headless Browser Automation**: Uses Selenium with Chrome in headless mode for seamless data scraping.
-4. **Structured Data Storage**: Organizes scraped data in a user-friendly format in Google Sheets.
-5. **Automated Login and Data Extraction**: Logs into the target website and extracts lottery result data at regular intervals.
+- **Automated Data Scraping:** Extracts lottery results from predefined games on the Thai lottery website.
+- **Scheduled Scraping:** Executes data scraping at user-defined intervals.
+- **Data Storage:** Stores the scraped data in a Google Spreadsheet.
+- **Headless Browser Automation:** Uses Selenium with a headless Chrome browser for scraping.
+- **User Authentication:** Automates login process to access restricted data.
+- **Error Handling and Retry Mechanism:** Implements a retry mechanism for robust data appending to the worksheet.
 
 ## Requirements
-
 - Python 3.x
-- Selenium
-- gspread
-- oauth2client
+- Selenium WebDriver
+- Google Sheets API
 - BeautifulSoup
-- ChromeDriver (compatible with the installed version of Chrome)
-- A Google Cloud Platform account with Google Sheets API enabled
-- A .env file with the path to your Google Sheets credentials JSON file
+- Tkinter (for GUI input)
+- Chrome browser (for headless execution)
 
-## Setup and Installation
-
-1. **Environment Setup**: 
-   - Install Python 3.x from the official website.
-   - Install required Python libraries: `pip install selenium gspread oauth2client beautifulsoup4 python-dotenv`.
-
-2. **ChromeDriver Setup**:
-   - Download ChromeDriver from its official website.
-   - Ensure it is compatible with your Chrome browser's version.
-   - Place the ChromeDriver executable in a known directory.
-
-3. **Google Sheets API Setup**:
-   - Go to the Google Cloud Platform Console.
-   - Create a new project and enable the Google Sheets API.
-   - Create credentials for a service account and download the JSON file.
-   - Place this JSON file in a secure location and note its path.
-
-4. **.env File**:
-   - Create a `.env` file in the same directory as your script.
-   - Add the following line: `GOOGLE_SHEETS_CREDENTIALS_PATH="<path_to_your_service_account_json>"`.
-
-5. **Google Sheets Preparation**:
-   - Create a new Google Sheets document.
-   - Share it with the email found in your service account JSON file with editor access.
+## Installation
+1. **Install Dependencies:** Use `pip install -r requirements.txt` to install the necessary Python libraries.
+2. **Chrome WebDriver:** Ensure that the Chrome WebDriver is installed and added to the system path.
+3. **Google Sheets API Setup:** Follow Google's setup guide to configure access to Google Sheets.
+4. **Environment File:** Create a `.env` file with your Google Sheets credentials and other environment variables.
 
 ## Usage
+1. **Set Duration:** When the script runs, a Tkinter dialog will prompt for the scraping interval in seconds.
+2. **Google Sheets Configuration:** Enter the URL of the Google Sheet and the worksheet name where the data will be stored.
+3. **Running the Script:** Execute the script via `python main.py`. The script runs indefinitely until manually stopped.
 
-1. **Running the Script**:
-   - Execute the script using `python <script_name>.py`.
-   - Enter the desired duration (in minutes) for data scraping frequency when prompted.
+## Data Extraction
+The script scrapes the following lottery games:
+- ยี่กี HUAY 5 นาที
+- ยี่กี HUAY VIP 5 นาที
+- ยี่กี LTO 5 นาที
+- ยี่กี LTO VIP 5 นาที
+- ยี่กี ชัดเจน 5 นาที
+- ยี่กี ชัดเจน VIP 5 นาที
 
-2. **Data Scraping and Upload**:
-   - The script logs into the target website using provided credentials.
-   - It scrapes the latest lottery data at the specified intervals.
-   - The data is then formatted and uploaded to the specified Google Sheets document.
+## Data Structure
+The data is structured with timestamps and game results, saved in rows in the specified Google Sheet.
 
-3. **Monitoring and Maintenance**:
-   - The script will run indefinitely. Monitor it for any errors or interruptions.
-   - To stop the script, simply terminate the Python process.
+## Disclaimer
+This script is intended for educational purposes only. Ensure compliance with the website's terms of service and relevant laws when scraping data.
 
-## Important Notes
-
-- **Credentials Security**: Ensure that your Google Sheets credentials JSON file is stored securely and not exposed.
-- **Website Changes**: The script may require updates if there are changes to the website's HTML structure.
-- **Error Handling**: Implement error handling for network issues or unexpected website changes to ensure continuous operation.
-
-## Conclusion
-
-This script provides a convenient and automated way to scrape lottery data and store it in Google Sheets. It is important to periodically check the script’s performance and make necessary updates based on website changes or other factors.
+## Support
+For support, please open an issue on the project's GitHub repository.
