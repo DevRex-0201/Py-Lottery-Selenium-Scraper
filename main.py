@@ -21,9 +21,9 @@ def ask_duration():
                                       prompt="Enter Duration in Seconds:")
     return int(USER_INP)  # Convert minutes to seconds
 
-def safe_append_to_worksheet(worksheet, data, max_retries=10, delay=5):
+def safe_append_to_worksheet(worksheet, data, max_retries=100, delay=5):
     attempts = 0
-    while attempts < max_retries:
+    while True:
         try:
             worksheet.append_row(data)
             break  # Break the loop if successful
@@ -121,15 +121,28 @@ while True:
     data_time = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
     data.append(data_time)
     for item in order:
-        value_1 = div_elements[item].find('span', class_='mb-0 mx-auto').get_text().split(" ")[-1]
-        value_2 = div_elements[item].find_all('div', class_='font-numeral')[0].get_text()
-        value_3 = div_elements[item].find_all('div', class_='font-numeral')[1].get_text()
-        data.append(value_1)
-        data.append(value_2)
-        data.append(value_3)
-        data_com.append(value_1)
-        data_com.append(value_2)
-        data_com.append(value_3)
+        # Check if the index 'item' is within the range of 'div_elements'
+        if item < len(div_elements):
+            div_element = div_elements[item]
+            span_element = div_element.find('span', class_='mb-0 mx-auto')
+            divs_font_numeral = div_element.find_all('div', class_='font-numeral')
+
+            # Check if the necessary elements are found
+            if span_element and len(divs_font_numeral) >= 2:
+                value_1 = span_element.get_text().split(" ")[-1]
+                value_2 = divs_font_numeral[0].get_text()
+                value_3 = divs_font_numeral[1].get_text()
+
+                data.append(value_1)
+                data.append(value_2)
+                data.append(value_3)
+                data_com.append(value_1)
+                data_com.append(value_2)
+                data_com.append(value_3)
+            else:
+                print(f"Required elements not found for item at index {item}.")
+        else:
+            print(f"Index {item} is out of range for 'div_elements'.")
     print(data)
     try:
         if data_com != total_data[-1]:
