@@ -1,0 +1,121 @@
+import os
+import dotenv
+import tkinter as tk
+from tkinter import simpledialog
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from bs4 import BeautifulSoup
+import time
+from datetime import datetime
+
+# Function to ask for duration using Tkinter
+def ask_duration():
+    ROOT = tk.Tk()
+    ROOT.withdraw()
+    # The input dialog
+    USER_INP = simpledialog.askstring(title="Set Duration",
+                                      prompt="Enter Duration in Minutes:")
+    return int(USER_INP) * 60  # Convert minutes to seconds
+
+# Set duration time
+duration = ask_duration()
+
+# Load environment variables from the .env file
+dotenv.load_dotenv()
+
+# Load Google Sheets credentials from environment variable
+google_credentials_path = os.getenv('GOOGLE_SHEETS_CREDENTIALS_PATH')
+if not google_credentials_path:
+    raise ValueError("The Google Sheets credentials path is not set in the environment variables")
+
+# Set the scope and credentials for Google Sheets
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name(google_credentials_path, scope)
+client = gspread.authorize(creds)
+
+# Open the Google Spreadsheet by title
+sheet_url = "https://docs.google.com/spreadsheets/d/1MUAZ2SH8jrIkczJ9rPwxHZ9lyuQ5fR2kSQZ9T3BRIeY/edit?usp=sharing"
+spreadsheet = client.open_by_url(sheet_url)
+
+# Get the worksheet by name
+worksheet_name = "Sheet1"
+worksheet = spreadsheet.get_worksheet(0)
+
+# If the worksheet is not found, create a new one
+if worksheet is None:
+    worksheet = spreadsheet.add_worksheet(title=worksheet_name, rows="100", cols="20")
+
+# Define the header names
+header_names = ["Data Time", "ยี่กี HUAY 5 นาที", "ยี่กี HUAY VIP 5 นาที", "ยี่กี LTO 5 นาที", "ยี่กี LTO VIP 5 นาที", "ยี่กี ชัดเจน 5 นาที", "ยี่กี ชัดเจน VIP 5 นาที"]
+
+# Check if the worksheet is empty (no header row) and add headers if needed
+existing_headers = worksheet.row_values(1)
+if not existing_headers:
+    worksheet.insert_row(header_names, index=1)
+
+# Chrome options for headless mode
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+
+# URL of the login page
+login_url = 'https://lottoone.net/login'
+
+# Your login credentials
+username = 'lottoone7124'
+password = 'ABCdef123'
+
+driver = webdriver.Chrome(options=chrome_options)
+driver.get(login_url)
+
+# Wait for the page to load
+time.sleep(2)
+
+# Find the username and password input fields and the submit button
+username_field = driver.find_element(By.ID, 'inputUsername')
+password_field = driver.find_element(By.ID, 'inputPassword')
+submit_button = driver.find_element(By.XPATH, '//button[@type="submit"]')
+
+# Enter your login credentials
+username_field.send_keys(username)
+password_field.send_keys(password)
+
+# Submit the form
+submit_button.click()
+
+# Wait for the next page to load or for login to complete
+time.sleep(5)
+
+# Repeat the data extraction every 'duration' seconds
+while True:
+    # Navigate to the data URL
+    driver.get("https://lottoone.net/member/lotto/result")
+    time.sleep(3)
+
+    # Extract the data
+    page_source = driver.page_source
+    soup = BeautifulSoup(page_source, 'html.parser')
+    div_elements = soup.find_all('div', class_='card card-fulid my-2')
+
+    order = [5, 7, 9, 11, 13, 15]
+    data = []
+    current_datetime = datetime.now()
+    # Format the date and time as YYYY-MM-DD HH:MM
+    data_time = current_datetime.strftime("%Y-%m-%d %H:%M")
+    data.append(data_time)
+    for item in order:
+        value_1 = div_elements[item].find('span', class_='mb-0 mx-auto').get_text().split(" ")[-1]
+        value_2 = div_elements[item].find_all('div', class_='font-numeral')[0].get_text()
+        value_3 = div_elements[item].find_all('div', class_='font-numeral')[1].get_text()
+        data.append(value_1)
+        data.append(value_2)
+        data.append(value_3)
+    print(data)
+    worksheet.append_row(data)
+
+    # Wait for the specified duration before repeating
+    time.sleep(duration)
+
+# Note: This loop will run indefinitely. You need to manually stop it or add a condition to break the loop.
