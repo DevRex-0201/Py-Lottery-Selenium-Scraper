@@ -6,6 +6,8 @@ from tkinter import simpledialog
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from bs4 import BeautifulSoup
@@ -81,7 +83,7 @@ login_url = 'https://lottoone.net/login'
 username = 'lottoone7124'
 password = 'ABCdef123'
 
-driver = webdriver.Chrome(options=chrome_options)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 driver.get(login_url)
 
 # Wait for the page to load
@@ -145,9 +147,24 @@ while True:
             print(f"Index {item} is out of range for 'div_elements'.")
     print(data)
     try:
-        if data_com != total_data[-1]:
-            total_data.append(data_com)
-            safe_append_to_worksheet(worksheet, data)
+        if data_com != total_data[-1] and len(data) >= 19:
+                total_data.append(data_com)
+                if data_com[0] == data_com[3] == data_com[6] == data_com[9] == data_com[12] == data_com[15]:
+                    if data_com[0] == "1":
+                        if data_com[1] != "XXX" and data_com[4] != "XXX" and data_com[7] != "XXX" and data_com[10] != "XXX" and data_com[13] != "XXX" and data_com[16] != "XXX":
+
+                            safe_append_to_worksheet(worksheet, data)
+
+                            if data_com[0] == data_com[3] == data_com[6] == data_com[9] == data_com[12] == data_com[15]:
+                                print("Value1 of lotto are same")
+                                time.sleep(150)
+
+                    else:
+                        safe_append_to_worksheet(worksheet, data)
+
+                        if data_com[0] == data_com[3] == data_com[6] == data_com[9] == data_com[12] == data_com[15]:
+                            print("Value1 of lotto are same")
+                            time.sleep(150)
     except Exception as e:
         print(f"An error occurred: {e}")
     # Wait for the specified duration before repeating
