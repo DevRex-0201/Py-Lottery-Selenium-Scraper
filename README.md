@@ -3,6 +3,10 @@
 ## Overview
 This Python project is designed to scrape and collect data from the Thai lottery website, specifically targeting various lottery games. It automatically extracts the latest results at specified intervals and stores them in a Google Spreadsheet for easy access and analysis.
 
+## Video Preview
+
+[![Video Preview](https://github.com/DevRex-0201/Project-Images/blob/main/video%20preview/Py-Lottery-Selenium-Scraper.png)](https://drive.google.com/file/d/1p2l2MHc4DB4CBRd-Ll9WorAQEu8YNAYN/view?usp=drive_link)
+
 ## Features
 - **Automated Data Scraping:** Extracts lottery results from predefined games on the Thai lottery website.
 - **Scheduled Scraping:** Executes data scraping at user-defined intervals.
